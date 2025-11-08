@@ -1,14 +1,19 @@
 #!/usr/bin/python3
 """
-Queries the Reddit API and prints the titles of the first 10 hot posts
+Queries the Reddit API and prints
+the titles of the first 10 hot posts
 listed for a given subreddit.
 """
 import requests
+import sys 
+#Import sys to use sys.stdout.write
+# for explicit output control
 
 
 def top_ten(subreddit):
     """
-    Prints the titles of the first 10 hot posts for a given subreddit.
+    Prints the titles of the first
+    10 hot posts for a given subreddit.
 
     Args:
         subreddit (str): The name of the subreddit.
@@ -16,7 +21,7 @@ def top_ten(subreddit):
     If the subreddit is invalid, prints None.
     """
     url = "https://www.reddit.com/r/{}/hot.json".format(subreddit)
-    headers = {'User-Agent': 'alx_api_advanced_project/1.0'}
+    headers = {'User-Agent': 'alx_api_advanced_project/1.0 by your_username'}
     params = {'limit': 10}
 
     try:
@@ -24,25 +29,30 @@ def top_ten(subreddit):
             url,
             headers=headers,
             params=params,
-            allow_redirects=False
+            allow_redirects=False,
+            timeout=5
         )
 
         if response.status_code != 200:
-            print("None")
+            # Print the literal string "None" followed
+            # by a single newline
+            sys.stdout.write("None\n")
             return
 
-        data = response.json().get("data")
-        if not data or "children" not in data:
-            print("None")
-            return
+        data = response.json().get('data', {})
+        posts = data.get('children', [])
 
-        posts = data.get("children", [])
         if not posts:
-            print("None")
+            sys.stdout.write("None\n")
             return
 
-        for post in posts[:10]:
-            print(post.get("data", {}).get("title"))
+        for post in posts:
+            title = post.get('data', {}).get('title')
+            if title:
+                print(title)
+                # print() automatically adds a single newline
 
-    except Exception:
-        print("None")
+    except requests.RequestException:
+        # Print the literal string
+        # "None" followed by a single newline
+        sys.stdout.write("None\n")
