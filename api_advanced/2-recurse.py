@@ -4,6 +4,7 @@
 Recursively queries the Reddit API and returns a list of titles for all hot articles.
 """
 import requests
+import sys
 
 # Use a specific and custom User-Agent
 HEADERS = {
@@ -22,16 +23,16 @@ def recurse(subreddit, hot_list=None, after=None):
         hot_list (list): The list accumulating post titles. Defaults to None 
                          to correctly handle the mutable default argument.
         after (str): The 'after' parameter for pagination.
-
+        
     Returns:
-        list: A list of hot article titles, or None if the subreddit is invalid.
+        list: A list of hot article titles, or None if the 
+        subreddit is invalid.
     """
     if hot_list is None:
         hot_list = []
         
     url = "https://www.reddit.com/r/{}/hot.json".format(subreddit)
     
-    # Parameters for the request (max limit per request)
     params = {'limit': 100}
     if after:
         params['after'] = after
