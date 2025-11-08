@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """
 0-subs
-Queries the Reddit API and returns the number of subscribers for a given subreddit.
+Finding sub count
 Returns 0 if the subreddit is invalid.
 """
 import requests
@@ -15,9 +15,8 @@ HEADERS = {
 
 def number_of_subscribers(subreddit):
     """
-    Queries the Reddit API and returns the number 
-    of subscribers for a given subreddit.
-    Returns 0 if the subreddit is invalid or an error occurs.
+    Finding sub count
+    Returns 0 if invalid.
     """
     url = "https://www.reddit.com/r/{}/about.json".format(subreddit)
 
@@ -25,7 +24,7 @@ def number_of_subscribers(subreddit):
         response = requests.get(
             url,
             headers=HEADERS,
-            allow_redirects=False,  
+            allow_redirects=False,
             timeout=5
         )
 
