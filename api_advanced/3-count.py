@@ -4,9 +4,9 @@
 Recursively queries the Reddit API, parses article titles, and prints a
 sorted count of given keywords.
 """
+from collections import Counter
 import re
 import requests
-from collections import Counter
 
 
 # Use a specific and custom User-Agent
@@ -24,8 +24,10 @@ def count_words(subreddit, word_list, after=None, counts=None):
     Args:
         subreddit (str): The name of the subreddit.
         word_list (list): List of keywords to count.
-        after (str): The 'after' pagination token for recursion. Defaults to None.
-        counts (dict): Dictionary accumulating the word counts. Defaults to None.
+        after (str): The 'after' pagination token 
+        for recursion. Defaults to None.
+        counts (dict): Dictionary accumulating 
+        the word counts. Defaults to None.
     """
     # Initialization on the first call
     if counts is None:
