@@ -1,14 +1,13 @@
 #!/usr/bin/python3
 """
 2-recurse
-Recursively queries the Reddit API 
-and returns a list of titles for all 
+Recursively queries the Reddit API
+and returns a list of titles for all
 hot articles.
 """
 import requests
 
 
-# Set a specific and custom User-Agent to comply with Reddit API rules
 HEADERS = {
     # REPLACE with your actual Reddit/GitHub username
     'User-Agent': 'alx_api_advanced_project/1.0 by your_username'
@@ -17,21 +16,24 @@ HEADERS = {
 
 def recurse(subreddit, hot_list=None, after=None):
     """
-    Recursively queries the Reddit API and 
+    Recursively queries the Reddit API and
     returns a list containing the titles
-    of all hot articles for a given subreddit. Handles pagination via the 'after'
+    of all hot articles for a given subreddit.
+    Handles pagination via the 'after'
     parameter.
 
     Args:
         subreddit (str): The name of the subreddit.
-        hot_list (list): The list accumulating post titles. It defaults to None
-                         to avoid issues with mutable default arguments, but is
-                         initialized to [] on the first call.
-        after (str): The 'after' pagination token returned 
+        hot_list (list): The list accumulating post titles.
+        It defaults to None
+        to avoid issues with mutable default arguments, but is
+        initialized to [] on the first call.
+        after (str): The 'after' pagination token returned
         by the API.
 
     Returns:
-        list: A list of hot article titles, or None if the subreddit is invalid.
+        list: A list of hot article titles, or None
+        if the subreddit is invalid.
     """
     # Initialize hot_list on the first call
     if hot_list is None:
@@ -39,7 +41,8 @@ def recurse(subreddit, hot_list=None, after=None):
 
     url = "https://www.reddit.com/r/{}/hot.json".format(subreddit)
 
-    # Parameters for the request (limit=100 is the max per request)
+    # Parameters for the request
+    # (limit=100 is the max per request)
     params = {'limit': 100}
     if after:
         params['after'] = after
