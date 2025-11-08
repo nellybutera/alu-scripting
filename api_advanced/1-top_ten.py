@@ -16,7 +16,7 @@ def top_ten(subreddit):
     If the subreddit is invalid, prints None.
     """
     url = "https://www.reddit.com/r/{}/hot.json".format(subreddit)
-    headers = {'User-Agent': 'alx_api_advanced_project/1.0 by your_username'}
+    headers = {'User-Agent': 'alx_api_advanced_project/1.0'}
     params = {'limit': 10}
 
     try:
@@ -24,25 +24,25 @@ def top_ten(subreddit):
             url,
             headers=headers,
             params=params,
-            allow_redirects=False,
-            timeout=5
+            allow_redirects=False
         )
 
         if response.status_code != 200:
-            print(None)
+            print("None")
             return
 
-        data = response.json().get('data', {})
-        posts = data.get('children', [])
+        data = response.json().get("data")
+        if not data or "children" not in data:
+            print("None")
+            return
 
+        posts = data.get("children", [])
         if not posts:
-            print(None)
+            print("None")
             return
 
-        for post in posts:
-            title = post.get('data', {}).get('title')
-            if title:
-                print(title)
+        for post in posts[:10]:
+            print(post.get("data", {}).get("title"))
 
-    except requests.RequestException:
-        print(None)
+    except Exception:
+        print("None")
