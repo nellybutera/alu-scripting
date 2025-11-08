@@ -1,68 +1,79 @@
 #!/usr/bin/python3
 """
-Recursively queries the Reddit API and prints a sorted count of given keywords.
+2-recurse
+Recursively queries the Reddit API and returns a list of titles for all hot articles.
 """
 import requests
 
+
+# Set a specific and custom User-Agent to comply with Reddit API rules
 HEADERS = {
+    # REPLACE with your actual Reddit/GitHub username
     'User-Agent': 'alx_api_advanced_project/1.0 by your_username'
 }
 
 
-def count_words(subreddit, word_list, after=None, counts=None):
+def recurse(subreddit, hot_list=None, after=None):
     """
-    Recursively queries the Reddit API, parses hot article titles,
-    and prints sorted count of given keywords (case-insensitive).
+    Recursively queries the Reddit API and returns a list containing the titles
+    of all hot articles for a given subreddit. Handles pagination via the 'after'
+    parameter.
 
     Args:
-        subreddit (str): subreddit name.
-        word_list (list): list of keywords to count.
-        after (str): token for pagination.
-        counts (dict): dictionary to store cumulative word counts.
+        subreddit (str): The name of the subreddit.
+        hot_list (list): The list accumulating post titles. It defaults to None
+                         to avoid issues with mutable default arguments, but is
+                         initialized to [] on the first call.
+        after (str): The 'after' pagination token returned by the API.
+
+    Returns:
+        list: A list of hot article titles, or None if the subreddit is invalid.
     """
-    if counts is None:
-        # Initialize counts dictionary (case-insensitive merge of duplicates)
-        counts = {}
-        for word in word_list:
-            key = word.lower()
-            counts[key] = counts.get(key, 0)
+    # Initialize hot_list on the first call
+    if hot_list is None:
+        hot_list = []
 
     url = "https://www.reddit.com/r/{}/hot.json".format(subreddit)
+
+    # Parameters for the request (limit=100 is the max per request)
     params = {'limit': 100}
     if after:
         params['after'] = after
 
     try:
-        res = requests.get(url, headers=HEADERS,
-                           params=params, allow_redirects=False,
-                           timeout=5)
-        if res.status_code != 200:
-            return
+        response = requests.get(
+            url,
+            headers=HEADERS,
+            params=params,
+            allow_redirects=False,  # Required: Do not follow redirects
+            timeout=5
+        )
 
-        data = res.json().get('data', {})
+        if response.status_code != 200:
+            # Base case: Invalid subreddit or API error (e.g., 404)
+            return None
+
+        # Safely extract data
+        data = response.json().get('data')
+        if not data:
+            return None
+
+        new_after = data.get('after')
         children = data.get('children', [])
-        next_after = data.get('after')
 
-        # Go through all post titles
+        # Collect titles from the current page
         for post in children:
-            title = post.get('data', {}).get('title', '').lower().split()
-            for w in title:
-                # Count only exact matches ignoring punctuation endings
-                for key in counts.keys():
-                    if w == key:
-                        counts[key] += 1
+            title = post.get('data', {}).get('title')
+            if title:
+                hot_list.append(title)
 
-        if next_after:
-            # Recursive call to next page
-            return count_words(subreddit, word_list, next_after, counts)
+        if new_after is None:
+            # Base case: No more pages to load (pagination is complete)
+            return hot_list
         else:
-            # Base case: all posts fetched
-            # Filter and sort results
-            filtered = {k: v for k, v in counts.items() if v > 0}
-            sorted_counts = sorted(filtered.items(),
-                                   key=lambda x: (-x[1], x[0]))
-            for word, cnt in sorted_counts:
-                print(f"{word}: {cnt}")
+            # Recursive step: Call the function again with the next 'after' token
+            return recurse(subreddit, hot_list, new_after)
 
     except requests.RequestException:
-        return
+        # Base case: Handle connection errors, DNS failures, etc.
+        return None
