@@ -1,7 +1,9 @@
 #!/usr/bin/python3
 """
 2-recurse
-Recursively queries the Reddit API and returns a list of titles for all hot articles.
+Recursively queries the Reddit API 
+and returns a list of titles for all 
+hot articles.
 """
 import requests
 
@@ -15,7 +17,8 @@ HEADERS = {
 
 def recurse(subreddit, hot_list=None, after=None):
     """
-    Recursively queries the Reddit API and returns a list containing the titles
+    Recursively queries the Reddit API and 
+    returns a list containing the titles
     of all hot articles for a given subreddit. Handles pagination via the 'after'
     parameter.
 
@@ -24,7 +27,8 @@ def recurse(subreddit, hot_list=None, after=None):
         hot_list (list): The list accumulating post titles. It defaults to None
                          to avoid issues with mutable default arguments, but is
                          initialized to [] on the first call.
-        after (str): The 'after' pagination token returned by the API.
+        after (str): The 'after' pagination token returned 
+        by the API.
 
     Returns:
         list: A list of hot article titles, or None if the subreddit is invalid.
@@ -68,12 +72,9 @@ def recurse(subreddit, hot_list=None, after=None):
                 hot_list.append(title)
 
         if new_after is None:
-            # Base case: No more pages to load (pagination is complete)
             return hot_list
         else:
-            # Recursive step: Call the function again with the next 'after' token
             return recurse(subreddit, hot_list, new_after)
 
     except requests.RequestException:
-        # Base case: Handle connection errors, DNS failures, etc.
         return None
