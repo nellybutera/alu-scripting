@@ -1,48 +1,48 @@
 #!/usr/bin/python3
 """
-1-top_ten
-Queries the Reddit API and prints the titles of the first 10 hot posts.
+Queries the Reddit API and prints the titles of the first 10 hot posts
+listed for a given subreddit.
 """
 import requests
-
-# Use a specific and custom User-Agent
-HEADERS = {
-    # REPLACE with your actual Reddit/GitHub username
-    'User-Agent': 'alx_api_advanced_project/1.0 by your_username'
-}
 
 
 def top_ten(subreddit):
     """
     Prints the titles of the first 10 hot posts for a given subreddit.
-    Prints None if the subreddit is invalid.
+
+    Args:
+        subreddit (str): The name of the subreddit.
+
+    If the subreddit is invalid, prints None.
     """
-    # Request up to 10 items
-    url = "https://www.reddit.com/r/{}/hot.json?limit=10".format(subreddit)
+    url = "https://www.reddit.com/r/{}/hot.json".format(subreddit)
+    headers = {'User-Agent': 'alx_api_advanced_project/1.0 by your_username'}
+    params = {'limit': 10}
 
     try:
         response = requests.get(
             url,
-            headers=HEADERS,
+            headers=headers,
+            params=params,
             allow_redirects=False,
             timeout=5
         )
 
-        if response.status_code == 200:
-            # Safely navigate the JSON structure
-            data = response.json().get('data', {})
-            posts = data.get('children', [])
+        if response.status_code != 200:
+            print(None)
+            return
 
-            if posts:
-                # Iterate and print the title of each post
-                for post in posts:
-                    print(post.get('data', {}).get('title'))
-            # If posts is an empty list, a valid subreddit might just be empty.
-            # We don't print anything extra here unless it's an error case.
-        else:
-            # Invalid subreddit or error
-            print("None")
+        data = response.json().get('data', {})
+        posts = data.get('children', [])
+
+        if not posts:
+            print(None)
+            return
+
+        for post in posts:
+            title = post.get('data', {}).get('title')
+            if title:
+                print(title)
 
     except requests.RequestException:
-        # Handle connection errors
-        print("None")
+        print(None)
