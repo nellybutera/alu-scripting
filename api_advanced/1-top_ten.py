@@ -39,7 +39,6 @@ def top_ten(subreddit):
                     print(post.get('data', {}).get('title'))
             # If posts is an empty list, a valid subreddit might just be empty.
             # We don't print anything extra here unless it's an error case.
-            
         else:
             # Invalid subreddit or error
             print("None")
