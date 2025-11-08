@@ -4,8 +4,8 @@
 Recursively queries the Reddit API, parses article titles, and prints a
 sorted count of given keywords.
 """
-import requests
 import re
+import requests
 from collections import Counter
 
 
@@ -32,8 +32,9 @@ def count_words(subreddit, word_list, after=None, counts=None):
         # Initialize counts and normalize word_list for pattern matching
         counts = Counter({word.lower(): 0 for word in word_list})
 
-        # Compile regex pattern to find whole words, case-insensitive
-        # \b ensures word boundaries, preventing 'java.' or 'javascript' from counting 'java'
+        # Compile regex pattern to find whole words, case-insensitive.
+        # \b ensures word boundaries, preventing 'java.' or 'javascript' from
+        # counting 'java' incorrectly. (Line E501 fixed by parentheses)
         keywords_pattern = r'\b(' + '|'.join(
             re.escape(word.lower()) for word in word_list) + r')\b'
 
@@ -67,9 +68,6 @@ def count_words(subreddit, word_list, after=None, counts=None):
             title = post.get('data', {}).get('title', '')
 
             # Find all matching keywords in the title (case-insensitive)
-            # Use the pre-compiled pattern if the function were restructured,
-            # but for a self-contained recursive function, the pattern is
-            # built only on the initial call (counts is None).
             found_words = re.findall(
                 keywords_pattern,
                 title,
@@ -97,9 +95,8 @@ def count_words(subreddit, word_list, after=None, counts=None):
             return
         else:
             # Recursive call with the next pagination token
-            # Pass the accumulated counts
             return count_words(subreddit, word_list, new_after, counts)
 
     except requests.RequestException:
-        # Base case: connection error (do nothing/print nothing as required)
+        # Base case: connection error (print nothing as required)
         return
